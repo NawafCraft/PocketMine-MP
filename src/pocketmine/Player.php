@@ -169,6 +169,8 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 	protected $messageCounter = 2;
 
 	protected $sendIndex = 0;
+	
+	private $message = [];
 
 	private $clientSecret;
 
@@ -2520,7 +2522,9 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 								$this->server->dispatchCommand($ev->getPlayer(), substr($ev->getMessage(), 1));
 								Timings::$playerCommandTimer->stopTiming();
 							}else{
+								
 								$this->server->getPluginManager()->callEvent($ev = new PlayerChatEvent($this, $ev->getMessage()));
+								$this->message[$this->getName()] = $ev->getMessage();
 								if(!$ev->isCancelled()){
 									$this->server->broadcastMessage($this->getServer()->getLanguage()->translateString($ev->getFormat(), [$ev->getPlayer()->getDisplayName(), $ev->getMessage()]), $ev->getRecipients());
 								}
@@ -3519,6 +3523,10 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 		$batch->encode();
 		$batch->isEncoded = true;
 		return $batch;
+	}
+	
+	public function getLastMessage(){
+        return $this->message[$this->getName()];
 	}
 
 }
