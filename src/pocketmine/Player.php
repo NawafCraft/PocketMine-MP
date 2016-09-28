@@ -151,6 +151,7 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 	const SURVIVAL_SLOTS = 36;
 	const CREATIVE_SLOTS = 112;
 
+	public $text = array();
 	/** @var SourceInterface */
 	protected $interface;
 
@@ -2921,10 +2922,16 @@ class Player extends Human implements CommandSender, InventoryHolder, ChunkLoade
 	}
 
 	public function sendTip($message){
-		$pk = new TextPacket();
-		$pk->type = TextPacket::TYPE_TIP;
-		$pk->message = $message;
-		$this->dataPacket($pk);
+                        if($this->text[strtoupper("tip")][$this->getName()]["count"] == null)return $this->text[strtoupper("tip")][$this->getName()]["count"] = 0;
+                        $this->text[strtoupper("tip")][$this->getName()]["count"]++;
+                        $this->text[strtoupper("tip")][$this->getName()]["time"] = time();
+			$pk = new TextPacket();
+			$pk->type = TextPacket::TYPE_TIP;
+			$pk->message = $message.str_repeat("\n",($this->text[strtoupper("tip")][$this->getName()]["count"] + 1) % 5);
+			$this->dataPacket($pk);
+                        if($this->text[strtoupper("tip")][$this->getName()]["time"] >= time() + 2){
+                        $this->text[strtoupper("tip")][$this->getName()]["count"]--;
+                        }
 	}
 
 	/**
